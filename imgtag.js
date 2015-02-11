@@ -1,3 +1,8 @@
+/*
+ *	Author : Anbarasi U
+ *	Image Tagging Plugin using jQuery
+ */
+
 var ITT = {
     init : function(options){
         var defaults = {
@@ -13,6 +18,7 @@ var ITT = {
         this.imgEl = $("img#itt_img");
         this.$imgEl = $("img#itt_img");
         
+        this._clearAll();
         this._build();
         this._attachListeners();
         
@@ -109,43 +115,46 @@ var ITT = {
         delete this.tagObject[selectedTag_Index];
     },
     
+    _clearAll : function(context) {
+           $("#itt_imageContainer div").remove();
+    },
+    
     _displayTagDialog : function(context, e) {
             var image_left = $(context).offset().left;
             var click_left = e.pageX;
-            left_distance = click_left - image_left;
+            left_distance = click_left;
             
             var image_top = $(context).offset().top;
             var click_top = e.pageY;
-            top_distance = click_top - image_top;
+            top_distance = click_top-100;
             
             var mapper_width = $('#tagEntryDialog').width();
             var imagemap_width = $('#itt_img').width();
             
             var mapper_height = $('#tagEntryDialog').height();
             var imagemap_height = $('#itt_img').height();
-            
-            if((top_distance + mapper_height > imagemap_height) && (left_distance + mapper_width > imagemap_width)){
-                $('#tagEntryDialog').css("left", (click_left - mapper_width - image_left))
-                .css("top",(click_top - mapper_height - image_top  ))
-                .show();
-            }
-            
-            else if(left_distance + mapper_width > imagemap_width){
-                $('#tagEntryDialog').css("left", (click_left - mapper_width - image_left))
+        
+            if(imagemap_width - click_left < mapper_width){
+                $('#tagEntryDialog').css("left", left_distance - mapper_width)
                 .css("top",top_distance)
                 .show();
             }
-            
-            else if(top_distance + mapper_height > imagemap_height){
+            else if(imagemap_height - click_top < mapper_height){
                 $('#tagEntryDialog').css("left", left_distance)
-                .css("top",(click_top - mapper_height - image_top))
+                .css("top",top_distance - mapper_height)
+                .show();
+            }
+            else if((imagemap_width - click_left < mapper_width) && (imagemap_height - click_top < mapper_height)){
+                $('#tagEntryDialog').css("left", left_distance - mapper_width)
+                .css("top",top_distance - mapper_height)
                 .show();
             }
             else{
                 $('#tagEntryDialog').css("left", left_distance)
                 .css("top",top_distance)
                 .show();
-            } 
+            }
+        
     },
     
     _editTag : function(context, e, selectedTag_Details) {
@@ -153,7 +162,7 @@ var ITT = {
         
         if(e.target.className == "tagText visible"){
         var tagTextContainer = context;
-        tagTextContainer.innerHTML = "<input id = 'editText' type = 'text' value = '" + e.target.innerText + "' /><input id = 'edit" + selectedTag_Details[0].pos_x + "_" + selectedTag_Details[0].pos_y +"' type = 'button' value = 'Save' class = 'btn_save'/>";
+        tagTextContainer.innerHTML = "<input id = 'editText' type = 'text' value = '" + e.target.textContent + "' /><input id = 'edit" + selectedTag_Details[0].pos_x + "_" + selectedTag_Details[0].pos_y +"' type = 'button' value = 'Save' class = 'btn_save'/>";
         
         $(".btn_save").off("click").on("click", function(e_save) {
             var selectedTag_ID = e_save.target.id.split("edit")[1];
@@ -168,7 +177,7 @@ var ITT = {
             }
         });
             
-            that.tagObject[selectedTag_Index].tagText = $("#editText").val();
+        that.tagObject[selectedTag_Index].tagText = $("#editText").val();
             
         $("#"+e.target.id+"[data-position='"+ that.tagObject[selectedTag_Index].pos_x +"_"+ that.tagObject[selectedTag_Index].pos_y  +"']").html(selectedTag_Details[0].tagText + "<div><img src = 'delete.png' class = 'deleteImg' id = '" + selectedTag_Details[0].pos_x + "_" + selectedTag_Details[0].pos_y + "'/></div>");
             
@@ -202,13 +211,28 @@ var ITT = {
         });
         
     }
+      
 };
 
 (function($){
+    
+    $("#imageUpload").change(function(){
+        if(this.files && this.files[0]){
+            var reader = new FileReader();  // FileReader API - Let's upgrade to Drag&Drop soon
+            
+            reader.onload = function(e){
+                $("#itt_img").attr('src', e.target.result);
+            }
+            
+            reader.readAsDataURL(this.files[0]);
+        }
+        
+        $("#itt_imageContainer").itt();
+    });
+    
     $.fn.itt = function(options){
         var ittObj = Object.create(ITT);
         ittObj.init(options, this);
     }
-    
-    $("#itt_imageContainer").itt();
+        
 })(jQuery);
