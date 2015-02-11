@@ -67,3 +67,7 @@ input.tagTextInput {
     width : 24px;
     float:right;
 }
+
+.center{
+    text-align:center;
+}
