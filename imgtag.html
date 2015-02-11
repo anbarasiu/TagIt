@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html>
-<body>
+<body class = "center">
     
 <link href="imgtag.css" rel="stylesheet" type="text/css"/>
+
+<h1>Image Tagging Plugin</h1>
+
+<form action="/playground/ajax_upload" id="uploadForm">
+    <label>Upload your image and add tags and go crazy.</label>
+    <input type="file" size="20" id="imageUpload" class="">
+</form>
     
 <div id = "itt_imageContainer">
-<img src = "GEC2.jpg" id = "itt_img"/>
+<img src = "#" id = "itt_img"/>
 </div>
     
 <script type="text/javascript" src="jquery.js"></script>
